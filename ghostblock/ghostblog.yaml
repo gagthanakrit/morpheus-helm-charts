@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghost-blog
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ghost-blog
+  template:
+    metadata:
+      labels:
+        app: ghost-blog
+    spec:
+      containers:
+      - name: ghost
+        image: ghost:5-alpine
+        ports:
+        - containerPort: 2368
+        env:
+        - name: NODE_ENV
+          value: development
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ghost-blog-svc
+  namespace: demo
+spec:
+  type: LoadBalancer
+  selector:
+    app: ghost-blog
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 2368
