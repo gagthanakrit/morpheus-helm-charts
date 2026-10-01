@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'ghostblog/ghostblog.yaml'
+      - 'ghostblock/ghostblog.yaml'
 
 jobs:
   deploy-to-k8s:
