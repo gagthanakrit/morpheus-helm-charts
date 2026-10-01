@@ -14,7 +14,7 @@ env:
 jobs:
   deploy-via-morpheus:
     name: Tell Morpheus to Re-deploy
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     
     steps:
       - name: Trigger Instance Redeploy
