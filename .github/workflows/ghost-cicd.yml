@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'ghostblog/ghostblog.yaml'  # Only trigger when Ghost YAML changes
+      - 'ghostblock/ghostblog.yaml'  # Only trigger when Ghost YAML changes
 
 env:
   MORPHEUS_URL: ${{ secrets.MORPHEUS_URL }}
