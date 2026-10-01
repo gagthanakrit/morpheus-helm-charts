@@ -4,10 +4,7 @@ metadata:
   name: ghost-blog
   namespace: demo
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: ghost-blog
+  replicas: 3
   template:
     metadata:
       labels:
