@@ -18,7 +18,7 @@ jobs:
       - name: Deploy Ghost YAML
         run: |
           echo "=== Applying latest YAML to Kubernetes ==="
-          kubectl apply -f ghostblog/ghostblog.yaml
+          kubectl apply -f ghostblock/ghostblog.yaml
           
       - name: Verify Pods
         run: |
