@@ -5,6 +5,9 @@ metadata:
   namespace: demo
 spec:
   replicas: 3
+  selector:
+    matchLabels:
+      app: ghost-blog
   template:
     metadata:
       labels:
