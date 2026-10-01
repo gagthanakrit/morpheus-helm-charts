@@ -1,0 +1,79 @@
+name: Ghost Blog CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'ghostblog/ghostblog.yaml'  # Only trigger when Ghost YAML changes
+
+env:
+  MORPHEUS_URL: ${{ secrets.MORPHEUS_URL }}
+  MORPHEUS_TOKEN: ${{ secrets.MORPHEUS_TOKEN }}
+  MORPHEUS_INSTANCE_ID: ${{ secrets.MORPHEUS_INSTANCE_ID }} # The ID of your Ghost instance in Morpheus
+
+jobs:
+  deploy-via-morpheus:
+    name: Tell Morpheus to Re-deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger Instance Redeploy
+        run: |
+          echo "=== Calling Morpheus API to update Instance $MORPHEUS_INSTANCE_ID ==="
+          
+          # This calls the Morpheus API to reconfigure/re-provision the K8s Instance
+          # It forces Morpheus to pull the latest ghostblog.yaml from Git and apply it!
+          
+          RESPONSE_CODE=$(curl -s -o response.json -w "%{http_code}" \
+            --request PUT \
+            --url "${{ env.MORPHEUS_URL }}/api/instances/${{ env.MORPHEUS_INSTANCE_ID }}" \
+            --header "Authorization: Bearer ${{ env.MORPHEUS_TOKEN }}" \
+            --header "Content-Type: application/json" \
+            --insecure \
+            --data '{
+              "instance": {
+                "name": "Ghost-Blog-Instance"
+              }
+            }')
+            
+          echo "Morpheus API Status: $RESPONSE_CODE"
+          cat response.json
+          
+          if [ "$RESPONSE_CODE" -ge 200 ] && [ "$RESPONSE_CODE" -lt 300 ]; then
+            echo "✅ Successfully triggered Morpheus deployment!"
+          else
+            echo "❌ Failed to trigger Morpheus!"
+            exit 1
+          fi
+
+      - name: Wait for Deployment
+        run: |
+          echo "Waiting 30 seconds for K8s to pull the new Ghost image..."
+          sleep 30
+          
+      - name: Smoke Test Ghost Blog
+        run: |
+          echo "=== Fetching live IP from Morpheus ==="
+          IP=$(curl -s \
+            --url "${{ env.MORPHEUS_URL }}/api/instances/${{ env.MORPHEUS_INSTANCE_ID }}" \
+            --header "Authorization: Bearer ${{ env.MORPHEUS_TOKEN }}" \
+            --insecure | python3 -c "
+          import sys, json
+          d = json.load(sys.stdin)
+          print(d.get('instance', {}).get('connectionInfo', [{}])[0].get('ip', ''))
+          ")
+          
+          if [ -z "$IP" ]; then
+            echo "⚠️ Could not find IP, skipping smoke test."
+            exit 0
+          fi
+          
+          echo "Testing http://$IP ..."
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 http://$IP)
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+            echo "✅ Ghost Blog is up and responding!"
+          else
+            echo "❌ Ghost Blog failed to respond! (HTTP $HTTP_CODE)"
+            exit 1
+          fi
+
