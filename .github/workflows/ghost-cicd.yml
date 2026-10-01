@@ -25,16 +25,11 @@ jobs:
           # It forces Morpheus to pull the latest ghostblog.yaml from Git and apply it!
           
           RESPONSE_CODE=$(curl -s -o response.json -w "%{http_code}" \
-            --request PUT \
-            --url "${{ env.MORPHEUS_URL }}/api/instances/${{ env.MORPHEUS_INSTANCE_ID }}" \
+            --request POST \
+            --url "${{ env.MORPHEUS_URL }}/api/instances/${{ env.MORPHEUS_INSTANCE_ID }}/apply" \
             --header "Authorization: Bearer ${{ env.MORPHEUS_TOKEN }}" \
             --header "Content-Type: application/json" \
-            --insecure \
-            --data '{
-              "instance": {
-                "name": "Ghost-Blog-Instance"
-              }
-            }')
+            --insecure)
             
           echo "Morpheus API Status: $RESPONSE_CODE"
           cat response.json
