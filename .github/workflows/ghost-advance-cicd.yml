@@ -9,18 +9,18 @@ on:
 jobs:
   deploy-to-advance-k8s:
     name: Deploy to Morpheus Advance K8s
-    runs-on: self-hosted
-    
+    runs-on: [self-hosted, Windows]
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Deploy Ghost YAML
         run: |
-          Write-Host "=== Applying YAML to Morpheus Advance Cluster ==="
+          echo "=== Applying YAML to Morpheus Advance Cluster ==="
           kubectl apply -f ghostblock/ghostblog-advanced.yml
-          
+
       - name: Verify Pods
         run: |
-          Write-Host "=== Morpheus Advance Pod Status ==="
+          echo "=== Morpheus Advance Pod Status ==="
           kubectl get pods -n demo
