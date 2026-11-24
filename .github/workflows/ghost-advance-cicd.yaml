@@ -9,7 +9,7 @@ on:
 jobs:
   deploy-to-advance-k8s:
     name: Deploy to Morpheus Advance K8s
-    runs-on: [self-hosted, Windows]
+    runs-on: self-hosted
     
     steps:
       - name: Checkout Code
