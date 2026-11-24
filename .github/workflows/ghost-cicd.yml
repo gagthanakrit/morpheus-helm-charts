@@ -9,7 +9,7 @@ on:
 jobs:
   deploy-to-k8s:
     name: Deploy to Kubernetes
-    runs-on: self-hosted
+    runs-on: [self-hosted, Windows]
     
     steps:
       - name: Checkout Code
