@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'ghostblock/ghostblog-advanced.yaml'
+      - 'ghostblock/ghostblog-advanced.yml'
 
 jobs:
   deploy-to-advance-k8s:
@@ -18,7 +18,7 @@ jobs:
       - name: Deploy Ghost YAML
         run: |
           Write-Host "=== Applying YAML to Morpheus Advance Cluster ==="
-          kubectl apply -f ghostblock/ghostblog-advanced.yaml
+          kubectl apply -f ghostblock/ghostblog-advanced.yml
           
       - name: Verify Pods
         run: |
